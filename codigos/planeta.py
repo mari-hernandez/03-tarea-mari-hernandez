@@ -5,7 +5,6 @@ G = 1
 M = 1
 m = 1
 
-
 class Planeta(object):
     """
     La clase planeta, crea un planeta dadas su condiciones iniciales de
@@ -26,6 +25,8 @@ class Planeta(object):
         >> 0.
         """
         self.y_actual = condicion_inicial
+        self.fuerza_actual_x=[]
+        self.fuerza_actual_y=[]
         self.t_actual = 0.
         self.alpha = alpha
 
@@ -38,6 +39,8 @@ class Planeta(object):
         r = (x**2 + y**2)**(1/2)
         fx = - x * (G * M * m / r**3 - 2 * self.alpha * G * M * m / r**4)
         fy = - y * (G * M * m / r**3 - 2 * self.alpha * G * M * m / r**4)
+        self.fuerza_actual_x.append(fx)
+        self.fuerza_actual_y.append(fy)
         return [vx, vy, fx, fy]
 
     def avanza_rk4(self, dt):
@@ -68,15 +71,11 @@ class Planeta(object):
         Similar a avanza_rk4, pero usando Verlet.
         """
         x, y, vx, vy=self.y_actual                                        
-        vx, vy, fx, fy=self.ecuacion_de_movimiento()  
-
+        vx, vy, fx, fy=self.ecuacion_de_movimiento()
         x_n=x+dt*vx+fx*(dt**2)/2
-        
         y_n=y+dt*vy+fy*(dt**2)/2
-        
         self.y_actual=[x_n, y_n, vx, vy]    
         vx1, vy1, fx1, fy1=self.ecuacion_de_movimiento() 
-
         vx_n=vx+fx1*dt/2+fx*dt/2
         vy_n=vy+fy1*dt/2+fy*dt/2
         self.y_actual=[x_n, y_n, vx_n, vy_n]
@@ -88,8 +87,21 @@ class Planeta(object):
         """
         Similar a avanza_rk4, pero usando Beeman.
         """
-
-
+        x, y, vx, vy=self.y_actual 
+        fx=self.fuerza_actual_x[-1]
+        fy=self.fuerza_actual_y[-1]
+        vx, vy, fx_mas1, fy_mas1= self.ecuacion_de_movimiento()
+        
+        x_n=x+vx*dt+(1/6)*(4*fx_mas1-fx)*(dt**2)
+        y_n=y+vy*dt+(1/6)*(4*fy_mas1-fy)*(dt**2)
+        
+        vx_mas, vy_mas, fx_mas2, fy_mas2=self.ecuacion_de_movimiento()
+        vx_n=vx+(1/12)*(5*fx_mas2+8*fx_mas1-fx)*dt
+        vy_n=vy+(1/12)*(5*fy_mas2+8*fy_mas1-fy)*dt
+        
+        self.y_actual=[x_n, y_n, vx_n, vy_n]
+        self.t_actual+=dt
+        
         pass
 
     def energia_total(self):
