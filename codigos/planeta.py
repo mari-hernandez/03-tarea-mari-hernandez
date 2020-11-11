@@ -5,6 +5,7 @@ G = 1
 M = 1
 m = 1
 
+
 class Planeta(object):
     """
     La clase planeta, crea un planeta dadas su condiciones iniciales de
@@ -18,15 +19,19 @@ class Planeta(object):
         """
         __init__ es un método especial que se usa para inicializar las
         instancias de una clase.
-
-        Ej. de uso:
-        >> mercurio = Planeta([x0, y0, vx0, vy0])
-        >> print(mercurio.alpha)
-        >> 0.
+        y_actual guarda posicion y velocidades en el tiempo actual de la forma
+        [x, y, vx, vy]
+        fuerza_actual_x guarda la fuerza en el eje x en el momento actual
+        en la posicion [-1]
+        fuerza_actual_y guarda la fuerza en el eje y en el momento actual
+        en la posicion [-1]
+        t_actual guarda el tiempo
+        alpha guarda el valor alpha, el cual si no es especificado
+        se toma como 0
         """
         self.y_actual = condicion_inicial
-        self.fuerza_actual_x=[]
-        self.fuerza_actual_y=[]
+        self.fuerza_actual_x = []
+        self.fuerza_actual_y = []
         self.t_actual = 0.
         self.alpha = alpha
 
@@ -70,38 +75,33 @@ class Planeta(object):
         """
         Similar a avanza_rk4, pero usando Verlet.
         """
-        x, y, vx, vy=self.y_actual                                        
-        vx, vy, fx, fy=self.ecuacion_de_movimiento()
-        x_n=x+dt*vx+fx*(dt**2)/2
-        y_n=y+dt*vy+fy*(dt**2)/2
-        self.y_actual=[x_n, y_n, vx, vy]    
-        vx1, vy1, fx1, fy1=self.ecuacion_de_movimiento() 
-        vx_n=vx+fx1*dt/2+fx*dt/2
-        vy_n=vy+fy1*dt/2+fy*dt/2
-        self.y_actual=[x_n, y_n, vx_n, vy_n]
-        self.t_actual+=dt
+        x, y, vx, vy = self.y_actual
+        vx, vy, fx, fy = self.ecuacion_de_movimiento()
+        x_n = x+dt*vx+fx*(dt**2)/2
+        y_n = y+dt*vy+fy*(dt**2)/2
+        self.y_actual = [x_n, y_n, vx, vy]
+        vx1, vy1, fx1, fy1 = self.ecuacion_de_movimiento()
+        vx_n = vx+fx1*dt/2+fx*dt/2
+        vy_n = vy+fy1*dt/2+fy*dt/2
+        self.y_actual = [x_n, y_n, vx_n, vy_n]
+        self.t_actual += dt
         pass
-
 
     def avanza_beeman(self, dt):
         """
         Similar a avanza_rk4, pero usando Beeman.
         """
-        x, y, vx, vy=self.y_actual 
-        fx=self.fuerza_actual_x[-1]
-        fy=self.fuerza_actual_y[-1]
-        vx, vy, fx_mas1, fy_mas1= self.ecuacion_de_movimiento()
-        
-        x_n=x+vx*dt+(1/6)*(4*fx_mas1-fx)*(dt**2)
-        y_n=y+vy*dt+(1/6)*(4*fy_mas1-fy)*(dt**2)
-        
-        vx_mas, vy_mas, fx_mas2, fy_mas2=self.ecuacion_de_movimiento()
-        vx_n=vx+(1/12)*(5*fx_mas2+8*fx_mas1-fx)*dt
-        vy_n=vy+(1/12)*(5*fy_mas2+8*fy_mas1-fy)*dt
-        
-        self.y_actual=[x_n, y_n, vx_n, vy_n]
-        self.t_actual+=dt
-        
+        x, y, vx, vy = self.y_actual
+        fx = self.fuerza_actual_x[-1]
+        fy = self.fuerza_actual_y[-1]
+        vx, vy, fx_mas1, fy_mas1 = self.ecuacion_de_movimiento()
+        x_n = x+vx*dt+(1/6)*(4*fx_mas1-fx)*(dt**2)
+        y_n = y+vy*dt+(1/6)*(4*fy_mas1-fy)*(dt**2)
+        vx_mas, vy_mas, fx_mas2, fy_mas2 = self.ecuacion_de_movimiento()
+        vx_n = vx+(1/12)*(5*fx_mas2+8*fx_mas1-fx)*dt
+        vy_n = vy+(1/12)*(5*fy_mas2+8*fy_mas1-fy)*dt
+        self.y_actual = [x_n, y_n, vx_n, vy_n]
+        self.t_actual += dt
         pass
 
     def energia_total(self):
